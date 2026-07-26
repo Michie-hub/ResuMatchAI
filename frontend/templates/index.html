@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResuMatch AI - AI Resume Screener & Job Matcher</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+</head>
+<body>
+    <div id="app" class="text-gray-800">
+        <!-- Header -->
+        <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200">
+            <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <a href="index.html" class="text-2xl font-bold text-gray-900">ResuMatch AI</a>
+                <div id="auth-buttons" class="flex items-center space-x-3">
+                    <button id="signInBtn" class="hidden md:block text-gray-600 hover:text-blue-600 transition">Sign In</button>
+                    <button id="signUpBtn" class="bg-blue-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-blue-700 transition shadow-sm">Sign Up</button>
+                </div>
+                <div id="user-session" class="hidden items-center space-x-4">
+                    <span id="userEmail" class="text-sm font-medium text-gray-700"></span>
+                    <button id="profileBtn" class="text-gray-600 hover:text-blue-600 transition text-sm font-semibold">Profile</button>
+                    <button id="logoutBtn" class="bg-gray-200 text-gray-800 font-semibold px-5 py-2 rounded-lg hover:bg-gray-300 transition text-sm">Logout</button>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <!-- Hero Section -->
+            <section class="py-20 md:py-32 bg-white">
+                <div class="container mx-auto px-6 text-center">
+                    <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight">Land Your Dream Job Faster</h1>
+                    <p class="mt-4 text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">Our AI-powered platform screens your resume against job descriptions, gives you a match score, and helps you build the perfect application.</p>
+                    <div class="mt-8 flex justify-center items-center gap-4">
+                        <a href="#features-jobseeker" class="cta-gradient text-white font-semibold px-8 py-4 rounded-lg shadow-lg transition transform hover:scale-105">Find My Next Job</a>
+                        <a href="#features-employer" class="bg-gray-200 text-gray-800 font-semibold px-8 py-4 rounded-lg shadow-lg transition transform hover:scale-105 hover:bg-gray-300">Find Top Talent</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features for Job Seekers -->
+            <section id="features-jobseeker" class="py-20">
+                <div class="container mx-auto px-6">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl md:text-4xl font-bold text-gray-900">Your Personal Career Assistant</h2>
+                        <p class="mt-3 text-gray-600 max-w-2xl mx-auto">Everything you need to stand out from the crowd and get hired.</p>
+                    </div>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100">
+                             <h3 class="text-xl font-bold mb-2">Resume & Job Matching</h3>
+                             <p class="text-gray-600">Upload your resume and a job description to get an instant match score and keyword analysis.</p>
+                        </div>
+                        <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100">
+                             <h3 class="text-xl font-bold mb-2">Global Job Search</h3>
+                             <p class="text-gray-600">Search for jobs from top platforms, save descriptions, and match your resume instantly.</p>
+                        </div>
+                        <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100">
+                             <h3 class="text-xl font-bold mb-2">AI Resume Builder</h3>
+                             <p class="text-gray-600">Generate a tailored resume for any job. Choose from professional templates and let our AI do the writing.</p>
+                        </div>
+                        <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100">
+                             <h3 class="text-xl font-bold mb-2">Career Profile</h3>
+                             <p class="text-gray-600">Store your skills, experience, and education to easily apply for jobs that fit your profile.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- AI Resume Builder Templates Preview -->
+            <section class="py-20 bg-white">
+                <div class="container mx-auto px-6">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl md:text-4xl font-bold text-gray-900">Craft the Perfect Resume</h2>
+                         <p class="mt-3 text-gray-600 max-w-2xl mx-auto">Choose a template and let our AI guide you in creating a resume that gets noticed.</p>
+                    </div>
+                    <div class="flex flex-wrap justify-center gap-8">
+                        <div class="w-full md:w-1/3 p-4 border border-gray-200 rounded-lg bg-gray-50 shadow-sm">
+                           <h4 class="font-bold text-center mb-2">Modern Minimalist</h4>
+                           <img src="https://placehold.co/400x565/e2e8f0/475569?text=Resume+Template+1" alt="Modern Resume Template" class="rounded-md w-full">
+                        </div>
+                        <div class="w-full md:w-1/3 p-4 border border-gray-200 rounded-lg bg-gray-50 shadow-sm">
+                            <h4 class="font-bold text-center mb-2">Classic Professional</h4>
+                            <img src="https://placehold.co/400x565/e2e8f0/475569?text=Resume+Template+2" alt="Classic Resume Template" class="rounded-md w-full">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features for Employers -->
+            <section id="features-employer" class="py-20">
+                <div class="container mx-auto px-6">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl md:text-4xl font-bold text-gray-900">Hire Smarter, Not Harder</h2>
+                        <p class="mt-3 text-gray-600 max-w-2xl mx-auto">Streamline your hiring process and find the best candidates in record time.</p>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                         <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100">
+                             <h3 class="text-xl font-bold mb-2">Batch Resume Screening</h3>
+                             <p class="text-gray-600">Upload multiple resumes at once and let our AI rank candidates based on your job description.</p>
+                        </div>
+                         <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100">
+                             <h3 class="text-xl font-bold mb-2">Job Description Hub</h3>
+                             <p class="text-gray-600">Manage all your job descriptions in one place and easily match them against new applicants.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FAQ Section -->
+            <section id="faq" class="py-20 bg-white">
+                <div class="container mx-auto px-6 max-w-3xl">
+                    <h2 class="text-3xl font-bold text-center mb-8">Frequently Asked Questions</h2>
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h3 class="font-semibold">How accurate is the matching score?</h3>
+                            <p class="text-gray-600 mt-2">Our AI analyzes semantic relevance, not just keywords, to provide a highly accurate match score. It considers skills, experience, and context to give you a comprehensive understanding of how well a resume fits a role.</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h3 class="font-semibold">Is my data secure?</h3>
+                            <p class="text-gray-600 mt-2">Absolutely. We use industry-standard encryption for data at rest and in transit. Your personal information and documents are kept private and secure. You have full control over your data.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About Section -->
+            <section id="about" class="py-20">
+                <div class="container mx-auto px-6 max-w-3xl text-center">
+                    <h2 class="text-3xl font-bold mb-4">About ResuMatch AI</h2>
+                    <p class="text-gray-600 leading-relaxed">We are a team of technologists and HR professionals dedicated to making the job application process more efficient and transparent for everyone. Our mission is to bridge the gap between talented individuals and great opportunities using the power of artificial intelligence.</p>
+                </div>
+            </section>
+
+            <!-- Newsletter Subscription -->
+            <section class="py-20 bg-blue-600 text-white">
+                <div class="container mx-auto px-6 text-center">
+                    <h2 class="text-3xl font-bold">Stay Ahead of the Curve</h2>
+                    <p class="mt-2">Subscribe to our newsletter for the latest job market reports and career tips.</p>
+                    <div class="mt-6 max-w-md mx-auto">
+                        <form class="flex">
+                            <input type="email" placeholder="Enter your email" class="w-full p-3 rounded-l-lg text-gray-800 focus:outline-none" required>
+                            <button type="submit" class="bg-gray-800 text-white font-semibold px-6 py-3 rounded-r-lg hover:bg-gray-900 transition">Subscribe</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="py-12">
+            <div class="container mx-auto px-6">
+                <div class="grid md:grid-cols-4 gap-8 mb-8">
+                    <div>
+                        <h3 class="font-bold text-lg mb-4">ResuMatch AI</h3>
+                        <p class="text-sm">Making job applications smarter with AI technology.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-4">Product</h4>
+                        <ul class="space-y-2 text-sm">
+                            <li><a href="#features-jobseeker">For Job Seekers</a></li>
+                            <li><a href="#features-employer">For Employers</a></li>
+                            <li><a href="#faq">FAQ</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-4">Company</h4>
+                        <ul class="space-y-2 text-sm">
+                            <li><a href="#about">About Us</a></li>
+                            <li><a href="#">Contact</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-4">Connect</h4>
+                        <ul class="space-y-2 text-sm">
+                            <li><a href="#">Twitter</a></li>
+                            <li><a href="#">LinkedIn</a></li>
+                            <li><a href="#">Support</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="border-t border-gray-700 pt-8 text-center text-sm">
+                    <p>&copy; 2025 ResuMatch AI. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modals -->
+    <div id="signUpModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-backdrop">
+        <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-md m-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Create Account</h2>
+                <button id="closeSignUpModal" class="text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+            </div>
+            <div class="space-y-4">
+                <button id="googleSignUpBtn" class="google-btn w-full flex items-center justify-center p-3 rounded-lg">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" class="h-6 w-6 mr-2">
+                    <span class="font-semibold">Sign Up with Google</span>
+                </button>
+                <div class="text-center text-gray-500">OR</div>
+                <form id="signUpForm">
+                    <div class="mb-4">
+                        <label for="signUpEmail" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" id="signUpEmail" class="mt-1 p-3 w-full border border-gray-300 rounded-md" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="signUpPassword" class="block text-sm font-medium text-gray-700">Password</label>
+                        <input type="password" id="signUpPassword" class="mt-1 p-3 w-full border border-gray-300 rounded-md" required>
+                    </div>
+                    <button type="submit" class="w-full cta-gradient text-white font-semibold py-3 rounded-lg">Sign Up</button>
+                    <p id="signUpError" class="text-red-500 text-sm mt-4 text-center"></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="signInModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-backdrop">
+        <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-md m-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Welcome Back</h2>
+                <button id="closeSignInModal" class="text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+            </div>
+            <div class="space-y-4">
+                <p id="signInSuccessMessage" class="text-green-600 text-sm text-center"></p>
+                <button id="googleSignInBtn" class="google-btn w-full flex items-center justify-center p-3 rounded-lg">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" class="h-6 w-6 mr-2">
+                    <span class="font-semibold">Sign In with Google</span>
+                </button>
+                <div class="text-center text-gray-500">OR</div>
+                <form id="signInForm">
+                    <div class="mb-4">
+                        <label for="signInEmail" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" id="signInEmail" class="mt-1 p-3 w-full border border-gray-300 rounded-md" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="signInPassword" class="block text-sm font-medium text-gray-700">Password</label>
+                        <input type="password" id="signInPassword" class="mt-1 p-3 w-full border border-gray-300 rounded-md" required>
+                    </div>
+                    <button type="submit" class="w-full cta-gradient text-white font-semibold py-3 rounded-lg">Sign In</button>
+                    <p id="signInError" class="text-red-500 text-sm mt-4 text-center"></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="profileModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-backdrop">
+        <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg m-4 overflow-y-auto max-h-screen">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Your Profile</h2>
+                <button id="closeProfileModal" class="text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+            </div>
+            <div>
+                <form id="profileForm" class="space-y-4">
+                    <div class="flex items-center space-x-6">
+                        <div id="profilePicContainer" class="profile-pic-container">
+                            <img id="profilePicPreview" src="https://placehold.co/100x100/e2e8f0/475569?text=Avatar" alt="Profile Picture" class="profile-pic-preview">
+                            <div class="profile-pic-overlay"><span>Change</span></div>
+                        </div>
+                        <input type="file" id="profilePicInput" class="hidden" accept="image/png, image/jpeg">
+                        <div class="w-full">
+                            <label for="profileFullName" class="block text-sm font-medium text-gray-700">Full Name</label>
+                            <input type="text" id="profileFullName" placeholder="Enter your full name" class="mt-1 p-3 w-full border border-gray-300 rounded-md">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="profileWebsiteUrl" class="block text-sm font-medium text-gray-700">Website/Portfolio URL (Optional)</label>
+                        <input type="url" id="profileWebsiteUrl" placeholder="https://..." class="mt-1 p-3 w-full border border-gray-300 rounded-md">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="profileCity" class="block text-sm font-medium text-gray-700">City</label>
+                            <input type="text" id="profileCity" class="mt-1 p-3 w-full border border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="profileCountry" class="block text-sm font-medium text-gray-700">Country</label>
+                            <input type="text" id="profileCountry" class="mt-1 p-3 w-full border border-gray-300 rounded-md">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="profileAbout" class="block text-sm font-medium text-gray-700">About / Bio</label>
+                        <textarea id="profileAbout" rows="3" class="mt-1 p-3 w-full border border-gray-300 rounded-md"></textarea>
+                    </div>
+                    <hr>
+                    <div>
+                        <label for="profileEmail" class="block text-sm font-medium text-gray-700">Email Address</label>
+                        <input type="email" id="profileEmail" class="mt-1 p-3 w-full border border-gray-300 rounded-md bg-gray-100" disabled>
+                        <p class="text-xs text-gray-500 mt-1">Member since: <span id="memberSince"></span></p>
+                    </div>
+                    <button type="submit" class="w-full cta-gradient text-white font-semibold py-3 rounded-lg">Save Changes</button>
+                    <p id="profileMessage" class="text-sm mt-4 text-center"></p>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='auth.js') }}"></script>
+
+</body>
+</html>

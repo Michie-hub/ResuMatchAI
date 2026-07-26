@@ -1,0 +1,454 @@
+/* Step Wizard Styles */
+.stepWrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 3rem;
+}
+
+/* Step layout */
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* center instead of self-start for symmetry */
+  gap: 0.5rem;
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  transition: all 0.4s ease;
+}
+
+/* Circle count */
+.step .count {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  background-color: #e5e7eb; /* Tailwind gray-200 */
+  color: #1b1d20; /* gray-500 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-family: "Raleway";
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+  transition: all 0.3s ease;
+}
+
+/* Step name */
+.step .name {
+  font-size: 0.875rem;
+  font-family: "Raleway";
+  font-weight: 600;
+  color: #6b7280;
+  transition: color 0.3s ease;
+  text-align: center;
+
+}
+
+/* Active step */
+.step.active .count {
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  color: #fff;
+  animation: bling 0.25s ease-in-out 0.25s both;
+
+}
+
+.step.active .name {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+/* Completed step */
+.step.completed .count {
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  color: #fff;
+  animation: bling 0.25s ease-in-out 0.25s both;
+
+}
+
+.step.completed .count::after {
+  position: absolute;
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.step.completed .name {
+  color: #3b82f6;
+}
+/* Active animation */
+@keyframes bling {
+  0% {
+    transform: scale(0.9);
+    box-shadow: rgba(0, 0, 0, 0.08) 0px 0px 2px 5px;
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 3px 9px;
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: rgba(0, 0, 0, 0.08) 0px 0px 2px 5px;
+  }
+}
+
+
+
+/* Step connecting bar */
+.stepBar {
+  position: absolute;
+  top: 35px;
+  left: 5%;
+  right: 5%;
+  height: 4px;
+  background-color: #e5e7eb;
+  z-index: 0;
+  border-radius: 2px;
+}
+
+.stepBar .progress {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #6366f1);
+  width: 0%;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+/* Keyframes for the "bling" animation */
+@keyframes bling-1ae73f75 {
+  0% {
+    transform: scale(0.9);
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 2px 5px;
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 3px 9px;
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: rgba(0, 0, 0, 0.08) 0px 0px 2px 6px;
+  }
+}
+/* Form Wrapper */
+.formWrapper {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.formWrapper .shadow {
+    background: white;
+    border-radius: 1rem;
+    padding: 3rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 2px dashed #d1d5db;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.formWrapper .shadow:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 15px 40px rgba(59, 130, 246, 0.15);
+}
+
+.formWrapper .shadow.dragover {
+    border-color: #6366f1;
+    background-color: #eff6ff;
+}
+
+.formWrapper .header {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 600;
+    font-family: "Raleway";
+    color: #1f2937;
+    margin-bottom: 1rem;
+    cursor: pointer;
+}
+
+.formWrapper input[type="file"] {
+    display: none;
+}
+
+.formWrapper .instruction {
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    font-family: "Raleway";
+
+}
+
+.formWrapper .swell {
+    background: linear-gradient(90deg, #3b82f6, #6366f1);
+    color: white;
+    border: none;
+    padding: 0.875rem 2rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    font-family: "Raleway";
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.formWrapper .swell:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.formWrapper .swell:active {
+    transform: translateY(0);
+}
+
+.formWrapper .types {
+    display: block;
+    margin-top: 1rem;
+    color: #9ca3af;
+    font-size: 0.75rem;
+    font-family: "Raleway";
+
+}
+
+.formWrapper .uploadedFile {
+    background-color: #f3f4f6;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.formWrapper .uploadedFile .fileName {
+    font-weight: 500;
+    color: #374151;
+    font-family: "Raleway";
+
+}
+.fileName{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-word; /* allows long words to wrap */
+  flex: 1;
+  min-width: 0;
+  max-width: 60%;
+}
+.formWrapper .uploadedFile .removeBtn {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    font-family: "Raleway";
+    cursor: pointer;
+    font-weight: 600;
+}
+.removeBtn:active {
+    background: rgb(251, 59, 59);
+}
+.formToggle {
+    display: block;
+    text-align: center;
+    margin-top: 1.5rem;
+    color: #3b82f6;
+    font-weight: 500;
+    font-family: "Raleway";
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.formToggle:hover {
+    color: #2563eb;
+}
+
+/* Textarea for paste */
+.pasteArea {
+    width: 100%;
+    min-height: 200px;
+    padding: 1rem;
+    border: 2px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-family: "Raleway";
+    font-size: 0.875rem;
+    resize: vertical;
+    margin-top: 1rem;
+}
+
+.pasteArea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Job Selection Step */
+.jobSelectionWrapper {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.jobOption {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.jobOption:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.jobOption.selected {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+}
+
+.jobOption .jobTitle {
+    font-weight: 600;
+    font-size: 1.125rem;
+    font-family: "Raleway";
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.jobOption .jobCompany {
+    color: #6b7280;
+    font-size: 0.875rem;
+    font-family: "Raleway";
+
+}
+
+/* Results Step */
+.resultsWrapper {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.scoreCircle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: 700;
+    font-family: "Raleway";
+    color: white;
+    margin: 2rem auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.keywordBadge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-family: "Raleway";
+    margin: 0.25rem;
+}
+
+.keywordBadge.found {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.keywordBadge.missing {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+/* Navigation Buttons */
+.wizardNavigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    gap: 1rem;
+}
+
+.wizardNavigation button {
+    padding: 0.75rem 2rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    font-family: "Raleway";
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.wizardNavigation .btnPrev {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+.wizardNavigation .btnPrev:hover {
+    background-color: #e5e7eb;
+}
+
+.wizardNavigation .btnNext {
+    background: linear-gradient(90deg, #3b82f6, #6366f1);
+    color: white;
+}
+
+.wizardNavigation .btnNext:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.wizardNavigation .btnNext:disabled {
+    background: #d1d5db;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Loading Animation */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .stepWrapper {
+        padding: 0 1rem;
+    }
+    
+    .step .name {
+        font-size: 0.75rem;
+        font-family: "Raleway";
+
+    }
+    
+    .step .count {
+        width: 35px;
+        height: 35px;
+        font-size: 0.875rem;
+    }
+    
+    .formWrapper .shadow {
+        padding: 2rem 1.5rem;
+    }
+}
+.hidden {
+  display: none;
+}

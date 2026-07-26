@@ -1,0 +1,73 @@
+# ResuMatch AI
+
+An AI-powered resume screening and job-matching platform. Job seekers upload a
+resume and get a compatibility score against saved or searched job postings,
+AI-generated improvement suggestions, and an AI-rewritten resume. Employers can
+screen candidate resumes against their own job postings the same way.
+
+## Features
+
+- **Firebase Authentication** — email/password and Google sign-in
+- **Resume matching** — TF-IDF + cosine similarity between resume and job
+  description text, with a 0–100 compatibility score and keyword gap analysis
+- **AI-powered suggestions & resume rewriting** — Google Gemini generates
+  targeted improvement suggestions and can produce a fully rewritten resume
+  (exported as a PDF, in a Modern or Classic template)
+- **Job search** — pulls live listings via the JSearch API
+- **Employer dashboard** — separate view for screening candidate resumes
+  against job postings
+
+## Tech Stack
+
+**Backend:** Python, Flask, SQLAlchemy (SQLite), Flask-Migrate
+**Auth:** Firebase Authentication (client SDK + Admin SDK token verification)
+**AI:** Google Gemini API, scikit-learn (TF-IDF/cosine similarity)
+**Frontend:** HTML, Tailwind CSS, vanilla JavaScript
+**PDF generation:** ReportLab
+
+## Project Structure
+
+```
+resume_screener_app/
+├── backend/
+│   └── app.py              # Flask app: routes, models, AI matching logic
+├── frontend/
+│   ├── templates/          # index.html, job_seekers.html, employers.html
+│   └── static/             # styles.css, wizard-styles.css, auth.js, dashboard.js
+└── requirements.txt
+```
+
+## Local Setup
+
+1. Create a virtual environment and install dependencies:
+   ```bash
+   python -m venv venv
+   source venv/Scripts/activate   # Windows Git Bash
+   pip install -r requirements.txt
+   ```
+
+2. Create a `.env` file in `backend/` with:
+   ```
+   GEMINI_API_KEY=your_key_here
+   GEMINI_MODEL_NAME=models/gemini-flash-latest
+   JSEARCH_API_KEY=your_key_here
+   GOOGLE_APPLICATION_CREDENTIALS=path/to/firebase-service-account.json
+   ```
+
+3. Run it:
+   ```bash
+   cd backend
+   python app.py
+   ```
+
+4. Visit **http://127.0.0.1:5000**
+
+## Known Limitations
+
+- Uses SQLite and local disk storage for resume files — fine for local dev
+  and a portfolio demo, not suitable for a durable production deployment
+  (would need Postgres + real object storage like S3).
+- Deployed on Render's free tier, which spins down after inactivity — the
+  first request after idle time may take 30–60 seconds to respond.
+- Email/password signup has a known issue currently being debugged; Google
+  sign-in is the reliable path in the meantime.

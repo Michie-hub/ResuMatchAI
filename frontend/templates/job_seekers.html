@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Seeker Dashboard - ResuMatch AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&family=DM+Serif+Display:ital@0;1&family=Raleway:ital,wght@0,100..900;1,100..900&family=Inter:wght@400;500;600;700;800&display=swap&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='wizard-styles.css') }}">
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+</head>
+<body>
+    <div id="app" class="text-gray-800 min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200">
+            <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <a href="index.html" class="text-2xl font-bold text-gray-900">ResuMatch AI</a>
+                <div class="flex items-center space-x-4">
+                    <a href="job_seekers.html" class="text-blue-600 font-semibold">Dashboard</a>
+                    <span id="userEmail" class="text-sm font-medium text-gray-700"></span>
+                    <button id="profileBtn" class="text-gray-600 hover:text-blue-600 transition text-sm font-semibold">Profile</button>
+                    <button id="logoutBtn" class="bg-gray-200 text-gray-800 font-semibold px-5 py-2 rounded-lg hover:bg-gray-300 transition text-sm">Logout</button>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow">
+            <section class="py-16">
+                <div class="container mx-auto px-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-12">JOB SEEKER DASHBOARD</h2>
+                    
+                   <!-- AI Matcher Wizard -->
+<div id="aiMatcherWizard" class="mb-16">
+    <h3 class="text-2xl font-semibold mb-8 text-center">AI RESUME MATCHER</h3>
+
+    <!-- Step Progress Bar -->
+    <div class="stepWrapper">
+        <div class="stepBar">
+            <div class="progress" id="wizardProgress"></div>
+        </div>
+        <div class="step one active" id="step1">
+            <div class="count">1</div>
+            <div class="name">Upload Resume</div>
+        </div>
+        <div class="step two" id="step2">
+            <div class="count">2</div>
+            <div class="name">Select Job</div>
+        </div>
+        <div class="step three" id="step3">
+            <div class="count">3</div>
+            <div class="name">View Results</div>
+        </div>
+    </div>
+
+    <!-- Step 1: Upload Resume -->
+    <div id="wizardStep1" class="wizardStep">
+        <div class="formWrapper">
+            <div class="shadow" id="dropZone">
+                <label for="wizardResumeInput" class="header">
+                    <span class="text-xl font-semibold mb-4 text-center">Upload your resume</span>
+                </label>
+                <input type="file" id="wizardResumeInput" accept=".pdf,.docx">
+                <p class="instruction">Drag and drop your resume here or click to browse</p>
+                <button class="swell" onclick="document.getElementById('wizardResumeInput').click()">
+                    Upload your resume
+                </button>
+                <span class="types">as .pdf or .docx file</span>
+                <div id="uploadedFileDisplay" class="hidden uploadedFile">
+                    <span class="fileName" id="uploadedFileName"></span>
+                    <button class="removeBtn" id="removeUploadedFile">Remove</button>
+                </div>
+            </div>
+            <span class="formToggle" id="togglePaste">Or paste resume text</span>
+            <textarea id="pasteResumeArea" class="pasteArea hidden" placeholder="Paste your resume text here..."></textarea>
+        </div>
+        <div class="wizardNavigation">
+            <button class="btnPrev" disabled>Previous</button>
+            <button class="btnNext" id="nextToJob" disabled>
+                Next: Select Job
+            </button>
+        </div>
+    </div>
+
+    <!-- Step 2: Select Job -->
+    <div id="wizardStep2" class="wizardStep hidden">
+        <div class="jobSelectionWrapper">
+            <h4 class="text-xl font-semibold mb-4 text-center">Select a job to match</h4>
+            <div id="wizardJobList" class="space-y-3"></div>
+            <div class="text-center mt-6">
+                <button class="formToggle" id="addNewJobBtn">+ Add New Job Description</button>
+            </div>
+        </div>
+        <div class="wizardNavigation">
+            <button class="btnPrev" id="backToResume">Previous</button>
+            <button class="btnNext" id="nextToResults" disabled>
+                <span id="analyzeText">Analyze Match</span>
+                <span id="analyzeLoading" class="loading hidden"></span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Step 3: View Results -->
+    <div id="wizardStep3" class="wizardStep hidden">
+        <div class="resultsWrapper">
+            <h4 class="text-xl font-semibold mb-4 text-center">Match Results</h4>
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="text-center">
+                    <div class="scoreCircle" id="wizardScoreCircle"></div>
+                    <p class="text-lg font-semibold text-gray-700 mb-6">Compatibility Score</p>
+                </div>
+                
+                <div class="mb-6">
+                    <h5 class="font-semibold text-lg mb-3">✅ Skills Found in Your Resume</h5>
+                    <div id="wizardKeywordsFound" class="flex flex-wrap gap-2"></div>
+                </div>
+                
+                <div class="mb-6">
+                    <h5 class="font-semibold text-lg mb-3">❌ Skills Missing from Your Resume</h5>
+                    <div id="wizardKeywordsMissing" class="flex flex-wrap gap-2"></div>
+                </div>
+                
+                <div class="text-center mt-8">
+                    <button id="improveResumeWizardBtn" class="bg-indigo-600 text-white font-semibold px-8 py-3 rounded-lg hover:bg-indigo-700 transition">
+                        🎯 Improve Resume with AI
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="wizardNavigation">
+            <button class="btnPrev" id="backToJob">Back</button>
+            <button class="btnNext" id="startOver">Start Over</button>
+        </div>
+    </div>
+</div>
+
+                    <!-- Divider -->
+                    <hr class="my-16 border-gray-200">
+                    
+                    <div class="grid lg:grid-cols-2 gap-12 mb-16">
+                        <!-- Resume Management -->
+                        <div>
+                            <h3 class="text-2xl font-semibold mb-4">MY RESUMES</h3>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                                <p id="resumeMessage" class="text-sm text-center mb-4"></p>
+                                <ul id="resumeList" class="space-y-2"></ul>
+                            </div>
+                        </div>
+
+                        <!-- Job Description Management -->
+                        <div>
+                            <h3 class="text-2xl font-semibold mb-4">SAVED JOBS</h3>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                                <p id="jobMessage" class="text-sm text-center mb-4"></p>
+                                <ul id="jobList" class="space-y-2"></ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Global Job Search -->
+                    <div class="mb-16">
+                        <h3 class="text-2xl font-semibold mb-4">BROWSE MORE JOBS</h3>
+                        <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                            <form id="jobSearchForm" class="flex flex-col sm:flex-row gap-4 mb-6">
+                                <input type="text" id="jobSearchQuery" class="p-3 w-full border border-gray-300 rounded-md" placeholder="Job title, keywords, or company" required>
+                                <input type="text" id="jobSearchLocation" class="p-3 w-full border border-gray-300 rounded-md" placeholder="City, State, or Country">
+                                <button type="submit" class="cta-gradient text-white font-semibold px-6 py-3 rounded-lg">Search</button>
+                            </form>
+                            <p id="jobSearchMessage" class="text-sm text-center mb-4"></p>
+                            <div id="jobSearchResults" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="py-12 mt-auto">
+            <div class="container mx-auto px-6">
+                <div class="grid md:grid-cols-4 gap-8 mb-8">
+                    <div>
+                        <h3 class="font-bold text-lg mb-4">ResuMatch AI</h3>
+                        <p class="text-sm">Making job applications smarter with AI technology.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-4">Product</h4>
+                        <ul class="space-y-2 text-sm">
+                            <li><a href="job_seekers.html">Job Seeker Dashboard</a></li>
+                            <li><a href="employers.html">Employer Dashboard</a></li>
+                            <li><a href="index.html#faq">FAQ</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-4">Company</h4>
+                        <ul class="space-y-2 text-sm">
+                            <li><a href="index.html#about">About Us</a></li>
+                            <li><a href="#">Contact</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-4">Connect</h4>
+                        <ul class="space-y-2 text-sm">
+                            <li><a href="#">Twitter</a></li>
+                            <li><a href="#">LinkedIn</a></li>
+                            <li><a href="#">Support</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="border-t border-gray-700 pt-8 text-center text-sm">
+                    <p>&copy; 2025 ResuMatch AI. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modals -->
+    <div id="profileModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-backdrop">
+        <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg m-4 overflow-y-auto max-h-screen">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Your Profile</h2>
+                <button id="closeProfileModal" class="text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+            </div>
+            <div>
+                <form id="profileForm" class="space-y-4">
+                    <div class="flex items-center space-x-6">
+                        <div id="profilePicContainer" class="profile-pic-container">
+                            <img id="profilePicPreview" src="https://placehold.co/100x100/e2e8f0/475569?text=Avatar" alt="Profile Picture" class="profile-pic-preview">
+                            <div class="profile-pic-overlay"><span>Change</span></div>
+                        </div>
+                        <input type="file" id="profilePicInput" class="hidden" accept="image/png, image/jpeg">
+                        <div class="w-full">
+                            <label for="profileFullName" class="block text-sm font-medium text-gray-700">Full Name</label>
+                            <input type="text" id="profileFullName" placeholder="Enter your full name" class="mt-1 p-3 w-full border border-gray-300 rounded-md">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="profileWebsiteUrl" class="block text-sm font-medium text-gray-700">Website/Portfolio URL (Optional)</label>
+                        <input type="url" id="profileWebsiteUrl" placeholder="https://..." class="mt-1 p-3 w-full border border-gray-300 rounded-md">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="profileCity" class="block text-sm font-medium text-gray-700">City</label>
+                            <input type="text" id="profileCity" class="mt-1 p-3 w-full border border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="profileCountry" class="block text-sm font-medium text-gray-700">Country</label>
+                            <input type="text" id="profileCountry" class="mt-1 p-3 w-full border border-gray-300 rounded-md">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="profileAbout" class="block text-sm font-medium text-gray-700">About / Bio</label>
+                        <textarea id="profileAbout" rows="3" class="mt-1 p-3 w-full border border-gray-300 rounded-md"></textarea>
+                    </div>
+                    <hr>
+                    <div>
+                        <label for="profileEmail" class="block text-sm font-medium text-gray-700">Email Address</label>
+                        <input type="email" id="profileEmail" class="mt-1 p-3 w-full border border-gray-300 rounded-md bg-gray-100" disabled>
+                        <p class="text-xs text-gray-500 mt-1">Member since: <span id="memberSince"></span></p>
+                    </div>
+                    <button type="submit" class="w-full cta-gradient text-white font-semibold py-3 rounded-lg">Save Changes</button>
+                    <p id="profileMessage" class="text-sm mt-4 text-center"></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmationModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-backdrop">
+        <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-sm m-4">
+            <h3 id="confirmationTitle" class="text-lg font-bold text-center mb-4">Are you sure?</h3>
+            <p id="confirmationMessage" class="text-sm text-gray-600 text-center mb-6">You won't be able to revert this.</p>
+            <div class="flex justify-center space-x-4">
+                <button id="confirmCancelBtn" class="bg-gray-200 text-gray-800 font-semibold px-6 py-2 rounded-lg hover:bg-gray-300">Cancel</button>
+                <button id="confirmDeleteBtn" class="bg-red-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-red-700">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="aiBuilderModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-backdrop">
+        <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-4xl m-4 overflow-y-auto max-h-screen">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">AI Resume Builder</h2>
+                <button id="closeAiBuilderModal" class="text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+            </div>
+            <div>
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <h4 class="font-semibold mb-2">1. Select a Template</h4>
+                        <div id="templateSelection" class="grid grid-cols-2 gap-4">
+                            <div class="template-card border-2 rounded-lg p-2 text-center cursor-pointer selected" data-template="modern">
+                                <img src="https://placehold.co/150x200/dbeafe/3b82f6?text=Modern" alt="Modern Template" class="w-full rounded mb-2">
+                                <p class="font-semibold text-sm">Modern</p>
+                            </div>
+                            <div class="template-card border-2 rounded-lg p-2 text-center cursor-pointer" data-template="classic">
+                                <img src="https://placehold.co/150x200/e5e7eb/4b5563?text=Classic" alt="Classic Template" class="w-full rounded mb-2">
+                                <p class="font-semibold text-sm">Classic</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-2">2. AI Suggestions</h4>
+                        <div id="aiSuggestionsContainer" class="bg-gray-50 p-4 rounded-lg h-48 overflow-y-auto border">
+                            <p class="text-gray-500 text-center py-10">AI suggestions will appear here...</p>
+                        </div>
+                    </div>
+                </div>
+                <p id="aiBuilderMessage" class="text-sm text-center mb-4"></p>
+                <button id="createAiResumeBtn" class="w-full cta-gradient text-white font-semibold py-3 rounded-lg">Create New AI-Powered Resume</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Make API_BASE_URL global
+        window.API_BASE_URL = '/api';
+    </script>   
+    <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+    
+
+
+</body>
+</html>
